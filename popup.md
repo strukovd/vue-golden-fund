@@ -5,7 +5,7 @@ touch popup.ts
 В popup.ts:
 ```ts
 import { useAppStore } from '@/store';
-import { App } from 'vue';
+import { type App } from 'vue';
 
 
 type PopupPlugin = {
@@ -57,6 +57,16 @@ const popupPlugin = {
 
 export default popupPlugin;
 
+```
+
+## 1.2. В plugins/index.ts:
+```ts
+import popup from './popup';
+// ..
+
+// ..
+	app
+		.use(popup)
 ```
 
 # 2. В components/common или другую

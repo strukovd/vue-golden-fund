@@ -5,7 +5,7 @@ touch modal.ts
 В modal.ts:
 ```ts
 import { useAppStore } from '@/store';
-import { App } from 'vue';
+import { type App } from 'vue';
 
 
 type ModalPlugin = {
