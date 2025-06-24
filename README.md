@@ -9,5 +9,14 @@
 
 ## TODO:
 Нужно добавить:
-- BaseAutocomplite
+- BaseBadge
+- BaseBreadcrumbs
+- BaseCheckbox
+- BaseColorPicker
+- BaseDatePicker
+- BaseFilePicker
+- BaseFileMultiPicker
+- BaseImagePicker
+- BaseMemo
+- BaseWeekDaysPicker
 - Resize директиву v-resizeble
