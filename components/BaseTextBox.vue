@@ -14,7 +14,7 @@
 				</header>
 				<section class="text-box-section">
 					<!-- <v-icon v-if="appendIcon" class="append-icon" :icon="appendIcon" color="rgba(23, 43, 77, 0.7)" size="1.4em"></v-icon>-->
-					<input :type="type" :placeholder="placeholder" :value="modelValue" @input="onInput">
+					<input :type="type" :placeholder="placeholder" :value="modelValue" @input="onInput" :autofocus="autofocus">
 					<!-- <v-icon v-if="type === 'password'" :icon="hideValue ? 'mdi-eye-outline' : 'mdi-eye-off-outline'" size="1.4em" @click="hideValue = !hideValue"></v-icon>-->
 					<BaseButton v-if="button && button.onClick" @click="button.onClick" secondary>{{ button.text }}</BaseButton>
 				</section>
@@ -48,6 +48,7 @@ export default defineComponent({
 				| 'time' | 'url' | 'week' | 'email' | 'number',
 			default: 'text'
 		},
+		autofocus: Boolean,
 		button: { type: Object as () => InnerButton },
 		error: String
 	},
