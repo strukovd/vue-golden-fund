@@ -20,3 +20,5 @@
 - BaseMemo
 - BaseWeekDaysPicker
 - Resize директиву v-resizeble
+
+- сетевой плагин\утилиту $http, где будут обертки\примеры для GET,POST,.., отправка файлов
