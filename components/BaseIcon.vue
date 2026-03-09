@@ -1,6 +1,7 @@
 <template>
 	<div class="base-icon">
-		<svg xmlns="http://www.w3.org/2000/svg"
+		<i v-if="isMDI" :class="mdiClass" :style="mdiStyle"></i>
+		<svg v-else xmlns="http://www.w3.org/2000/svg"
 			:width="size ?? width"
 			:height="size ?? height"
 			:viewBox="viewBox"
@@ -12,20 +13,20 @@
 </template>
 
 <script lang="ts">
-// В директории icons должны лежать svg файлы
+// В директории public/icons должны лежать .svg файлы
 
 import { defineComponent } from 'vue';
 
 export default defineComponent({
 	props: {
-		name: { type: String, default: '', },
-		width: { type: String, default: '24' },
-		height: { type: String, default: '24' },
+		name: { type: String, required: true },
+		width: { type: String },
+		height: { type: String },
 		vWidth: { type: String },
 		vHeight: { type: String },
-		size: { type: String, default: '24' },
+		size: { type: String, default: '1em' },
 		stroke: { type: String, default: 'none', },
-		fill: { type: String, default: '#000000', },
+		fill: { type: String },
 	},
 	name: 'BaseIcon',
 	data() {
@@ -34,17 +35,37 @@ export default defineComponent({
 		};
 	},
 	computed: {
+		isMDI(): boolean {
+			return this.name.startsWith('mdi-') || this.name.startsWith('mdil-');
+		},
+		mdiClass(): string {
+			const base = this.name.startsWith('mdil-') ? 'mdil' : 'mdi';
+			const name = this.name.replace(/^mdi(-light)?-/, 'mdi-');
+			return `${base} ${name}`;
+		},
+		mdiStyle(): Record<string, string> {
+			let fontSize = this.size;
+			if( /\d$/.test(fontSize) ) fontSize += 'px';
+			const styles = {} as Record<string, string>;
+			if( this.fill ) styles.color = this.fill;
+			if( fontSize ) styles.fontSize = fontSize;
+			styles.lineHeight = '1em';
+
+			return styles;
+		},
+
 		viewBox(): string {
 			return `0 0 ${this.vWidth ?? 24} ${this.vHeight ?? 24}`;
 		}
 	},
 	mounted() {
-		this.loadIcon(this.name);
+		if( !this.isMDI ) this.loadIcon(this.name);
 	},
 	methods: {
 		async loadIcon(iconName: string) {
 			try {
-				const response = await fetch(`/icons/${iconName}.svg`);
+				const urlPrefix = String(import.meta.env.BASE_URL).replace(/\/$/, '');
+				const response = await fetch(`${urlPrefix}/icons/${iconName}.svg`);
 				if (!response.ok) throw new Error('Icon not found');
 				this.svgContent = await response.text();
 			} catch (error) {
