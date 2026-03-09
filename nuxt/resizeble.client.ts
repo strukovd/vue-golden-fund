@@ -77,3 +77,33 @@ export default defineNuxtPlugin((nuxtApp) => {
 		},
 	});
 });
+
+
+
+/*
+.v-resizeble-handle {
+	position: absolute;
+	width: 1px;
+	background: #f0f0f0;
+	z-index: 99;
+	top: 0;
+	bottom: 0;
+	height:100%;
+	cursor: e-resize;
+	border-radius: 3px;
+	transition: all 100ms ease 0s;
+
+	&[data-side='left'] {
+		left: 0;
+	}
+
+	&[data-side='right'] {
+		right: 0;
+	}
+
+	&:hover {
+		background: #0079C2;
+		width: 3px;
+	}
+}
+*/
