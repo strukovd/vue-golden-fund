@@ -1,10 +1,10 @@
 import { isRef } from 'vue';
 
 type ResizebleConfig = {
-  width: number;
-  min?: number;
-  max?: number;
-  side?: 'left' | 'right';
+	width: number;
+	min?: number;
+	max?: number;
+	side?: 'left' | 'right';
 };
 
 const DEFAULT_WIDTH = 300;

@@ -24,9 +24,9 @@ declare module '@vue/runtime-core' {
 	}
 }
 declare module '#app' {
-  interface NuxtApp {
-    $popup: PopupPlugin;
-  }
+	interface NuxtApp {
+		$popup: PopupPlugin;
+	}
 }
 
 
@@ -147,7 +147,7 @@ popup: null as PopupModel | null,
 # 4. В App.vue
 ```vue
 <transition name="popup">
-  <Popup v-if="appStore.popup"/>
+	<Popup v-if="appStore.popup"/>
 </transition>
 ```
 
