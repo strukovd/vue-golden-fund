@@ -128,35 +128,33 @@ import { useAppStore } from '@/stores/App';
 import { defineAsyncComponent, type Component } from 'vue';
 
 const modalModules = import.meta.glob('./*Modal.vue');
-const modalComponentCache = new Map<string, Component>();
+const modalsCache = {} as Record<string, Component>;
 
-function toModalPath(template: string) {
-	const normalized = template.trim().toLowerCase();
-	if (!normalized) return null;
-
-	const fileName = `${normalized[0].toUpperCase()}${normalized.slice(1)}Modal.vue`;
+function preparePathToFile(template: string) {
+	const fileName = String(template)
+		.trim()
+		.replace(/Modal$|Modal.vue$/g, '')
+		.concat('Modal.vue');
 	return `./${fileName}`;
 }
 
 function resolveModalComponent(template?: string) {
 	if (!template) return null;
-	const key = template.trim().toLowerCase();
-	if (!key) return null;
 
-	const cached = modalComponentCache.get(key);
+	// Ищем шаблон в кэше
+	const cached = modalsCache[template];
 	if (cached) return cached;
 
-	const path = toModalPath(key);
-	if (!path) return null;
-
+	// Если в кэше нет, загружаем шаблон с сервера
+	const path = preparePathToFile(template);
 	const loader = modalModules[path];
 	if (!loader) {
 		console.warn(`[ModalWrapper] Unknown modal template: "${template}"`);
 		return null;
 	}
-
 	const asyncComponent = defineAsyncComponent(loader as () => Promise<{ default: Component }>);
-	modalComponentCache.set(key, asyncComponent);
+	// Сохраняем в кэш
+	modalsCache[template] = asyncComponent;
 	return asyncComponent;
 }
 
@@ -240,7 +238,6 @@ export default {
 	}
 }
 </style>
-
 ```
 
 ## 2.2. В src/components/modals (необязательный пример)
