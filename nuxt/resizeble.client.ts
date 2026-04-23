@@ -1,28 +1,62 @@
-import { isRef } from 'vue';
-
 type ResizebleConfig = {
-	width: number;
+	width?: number;
 	min?: number;
 	max?: number;
 	side?: 'left' | 'right';
+};
+type ResolvedResizebleConfig = {
+	width: number;
+	min: number;
+	max: number;
+	side: 'left' | 'right';
 };
 
 const DEFAULT_WIDTH = 300;
 const DEFAULT_MIN = 200;
 const DEFAULT_MAX = 1600;
+const DEFAULT_SIDE = 'left' as 'left' | 'right';
 
-const resolveParams = (bindingValue: any): ResizebleConfig | null => {
-	if (typeof bindingValue === 'number') return { width: bindingValue };
-	else if (typeof bindingValue === 'string') return { width: parseInt(bindingValue) };
-	else if (typeof bindingValue === 'object' && bindingValue.width !== undefined) { return bindingValue as ResizebleConfig; }
-	else return { width: DEFAULT_WIDTH };
+const resolveParams = (bindingValue: any, el: HTMLElement): ResolvedResizebleConfig | null => {
+	const computedStyle = window.getComputedStyle(el);
+	let width = Number.isFinite(parseFloat(computedStyle.width)) ? parseFloat(computedStyle.width) : DEFAULT_WIDTH;
+	let side = DEFAULT_SIDE;
+	let min = DEFAULT_MIN;
+	let max = DEFAULT_MAX;
+
+	if(bindingValue !== undefined && bindingValue !== null) {
+		if (typeof bindingValue === 'number') width = bindingValue;
+		else if (typeof bindingValue === 'string') {
+			if( [`left`,`right`].includes(bindingValue) ) { // Если "left" или "right"
+				side = bindingValue as 'left' | 'right';
+			}
+			else if( Number.isFinite(parseInt(bindingValue)) ) { // Если число
+				width = parseInt(bindingValue);
+			}
+			else { // Неизвестное
+				console.warn(`Unknown binding value "${bindingValue}"`);
+			}
+		}
+		else if (typeof bindingValue === 'object') {
+			if( [`left`,`right`].includes(bindingValue.side) ) side = bindingValue.side;
+			if(Number.isFinite(parseInt(bindingValue.width))) width = parseInt(bindingValue.width);
+			if(Number.isFinite(parseInt(bindingValue.min))) min = parseInt(bindingValue.min);
+			if(Number.isFinite(parseInt(bindingValue.max))) max = parseInt(bindingValue.max);
+		}
+	}
+
+	return {
+		width,
+		min,
+		max,
+		side,
+	};
 };
 
 
 export default defineNuxtPlugin((nuxtApp) => {
 	nuxtApp.vueApp.directive('resizeble', {
 		mounted(el, binding) {
-			const params = resolveParams(binding.value);
+			const params = resolveParams(binding.value, el);
 			if (!params) return;
 
 			// Создаем div.v-resizeble-handle - элемент для ресайза
@@ -37,14 +71,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 				(el as HTMLElement).style.position = 'relative';
 			}
 
-			const min = Number.isFinite(params.min) ? Number(params.min) : DEFAULT_MIN;
-			const max = Number.isFinite(params.max) ? Number(params.max) : DEFAULT_MAX;
-			const side = params.side ?? 'left';
-
+			const { min, max, side } = params;
 			const onMouseMove = (event: MouseEvent) => {
 				if (event.movementX === 0) return;
 				const delta = side === 'left' ? -event.movementX : event.movementX;
-				params.width = Math.max(min, Math.min(max, params.width + delta));
+				params.width = Math.max(min, Math.min(max, params.width! + delta));
 				(el as HTMLElement).style.width = `${params.width}px`;
 			};
 
@@ -77,33 +108,3 @@ export default defineNuxtPlugin((nuxtApp) => {
 		},
 	});
 });
-
-
-
-/*
-.v-resizeble-handle {
-	position: absolute;
-	width: 1px;
-	background: #f0f0f0;
-	z-index: 99;
-	top: 0;
-	bottom: 0;
-	height:100%;
-	cursor: e-resize;
-	border-radius: 3px;
-	transition: all 100ms ease 0s;
-
-	&[data-side='left'] {
-		left: 0;
-	}
-
-	&[data-side='right'] {
-		right: 0;
-	}
-
-	&:hover {
-		background: #0079C2;
-		width: 3px;
-	}
-}
-*/
